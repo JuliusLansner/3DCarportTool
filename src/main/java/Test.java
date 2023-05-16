@@ -13,15 +13,9 @@ public class Test
 		JavaCSG csg = JavaCSGFactory.createDefault();
 
 
-		int length = 240;
-		int width = 240;
 
-		if(length==240 && width==240){
-			int stolpeAmount = 4;
-			for (int i = 0; i < stolpeAmount ; i++) {
 
-		}
-		}
+		
 
 
 
