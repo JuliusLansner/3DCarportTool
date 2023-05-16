@@ -6,9 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="JavaCSG-intro" />
+        <module name="3DCarportTool" />
         <module name="JavaMavenProjectTemplate" />
         <module name="JavaCSGTemplate" />
+        <module name="JavaCSG-intro" />
       </profile>
     </annotationProcessing>
   </component>
