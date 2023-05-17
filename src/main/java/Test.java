@@ -7,10 +7,16 @@ import java.util.Scanner;
 
 public class Test
 {
-	public static void main(String[] args)
-	{
-		Scanner scan = new Scanner(System.in);
+	public static void main(String[] args) throws DatabaseException {
+		ConnectionPool connectionPool = new ConnectionPool();
+
+
 		JavaCSG csg = JavaCSGFactory.createDefault();
+		ArrayList<MaterialVariant> getid = MaterialVariantMapper.getMaterialVariantByID(23,connectionPool);
+		System.out.println(getid);
+
+
+
 
 
 
