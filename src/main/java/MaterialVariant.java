@@ -22,6 +22,41 @@ public class MaterialVariant {
         this.price = price;
     }
 
+    private double width;
+    private double height;
+    private double minLength;
+
+    public MaterialVariant(int materialeID, double width, double height, double minLength) {
+        this.materialeID = materialeID;
+        this.width = width;
+        this.height = height;
+        this.minLength = minLength;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public double getMinLength() {
+        return minLength;
+    }
+
+    public void setMinLength(double minLength) {
+        this.minLength = minLength;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -63,6 +98,8 @@ public class MaterialVariant {
                 ", partslistID=" + partslistID +
                 ", price=" + price +
                 ", description='" + description + '\'' +
+                ", width=" + width +
+                ", height=" + height +
                 '}';
     }
 }

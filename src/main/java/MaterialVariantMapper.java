@@ -16,7 +16,7 @@ public class MaterialVariantMapper {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setInt(1, IDStykliste);
                 ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
+                while (rs.next()) {
                     int materialeID = rs.getInt("materiale_id");
                     int length = rs.getInt("længde");
                     int partslistID = rs.getInt("stykliste_idstykliste");
@@ -24,8 +24,6 @@ public class MaterialVariantMapper {
                     int price = rs.getInt("pris");
                     materialVariant = new MaterialVariant(IDStykliste, materialeID, length, partslistID, description, price);
                     variants.add(materialVariant);
-                } else {
-                    throw new DatabaseException("No material variant were found with: " + IDStykliste);
                 }
             }
         } catch (SQLException ex) {
