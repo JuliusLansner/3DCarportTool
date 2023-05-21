@@ -26,7 +26,7 @@ public class Print {
      * @param orderID is used as a tool to match an ID.
      * @param connectionPool is used to work with the Mappers and Facades
      * @return A list of material variants associated with the order ID
-     * @throws SQLException      if there is a problem accessing the database
+     * @throws SQLException if there is a problem accessing the database
      * @throws DatabaseException if there is an error with the database connection or syntax errors
      */
     public List<MaterialVariant> findMaterialVariantsByOrderID(int orderID, ConnectionPool connectionPool) throws SQLException, DatabaseException {
@@ -139,5 +139,32 @@ public class Print {
 			z +=1;
 		}
 		return beamsToDraw;
+    }
+
+    public void printMVCounts(List<MaterialVariant> materialVariants){
+        // count the number of each type of material variant that is needed to build the project
+        // rafter means spær in danish
+        int rafterCount = 0;
+        int remmeCount = 0;
+        int stolpeCount = 0;
+
+        for (MaterialVariant materialVariant : materialVariants){
+            int materialID = materialVariant.getMaterialeID();
+            String description = materialVariant.getDescription();
+
+            if (materialID == 1 && description.equals("Spær til taget")){
+                rafterCount++;
+            } else if (materialID == 1 && description.equals("rem til oven på stolper")){
+                remmeCount++;
+            } else if (materialID == 2 && description.equals("Stolper til længde")){
+                stolpeCount++;
+            }
+        }
+
+        // shows the user how many of each item should be made
+        System.out.println("For at bygge projektet skal du bruge: ");
+        System.out.println("Spær: " + rafterCount);
+        System.out.println("Remme: " + remmeCount);
+        System.out.println("Stolper: " + stolpeCount);
     }
 }

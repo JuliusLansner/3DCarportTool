@@ -16,6 +16,7 @@ public class Test
 
 		// OBS ordre ID har stykliste ID 140
 		// Da der findes flere MV'er med samme material ID og længde genereres der "kun" 2 objekter
+		// I dette tilfælde er remme og spær det "samme".
 		int orderID = 60;
 
 		try {
@@ -33,6 +34,9 @@ public class Test
 
 			// view the collection
 			csg.view(collection);
+
+			// shows the user how many of each should be made to complete the project
+			print.printMVCounts(materialVariants);
 		} catch (SQLException |DatabaseException e) {
 			e.printStackTrace();
 		}
