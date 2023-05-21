@@ -1,3 +1,4 @@
+import org.abstractica.javacsg.Geometry3D;
 import org.abstractica.javacsg.JavaCSG;
 import org.abstractica.javacsg.JavaCSGFactory;
 
@@ -13,40 +14,38 @@ public class Test
 		JavaCSG csg = JavaCSGFactory.createDefault();
 		Print print = new Print();
 
+		// OBS ordre ID har stykliste ID 140
+		// Da der findes flere MV'er med samme material ID og længde genereres der "kun" 2 objekter
+		int orderID = 60;
 
-		System.out.println("Indtast ordre ID'et på den ordre du gerne vil 3D printe: ");
-		Scanner scanner = new Scanner(System.in);
-		int ordreID = scanner.nextInt();
+		try {
+			// find and convert the material variants
+			List<MaterialVariant> materialVariants = print.findAndConvertMVsByOrderID(orderID, connectionPool);
 
+			// filter the unique mv's
+			List<MaterialVariant> filteredMVs = print.filterUniqueMaterialVariants(materialVariants);
 
-//		int ordreID = 60; // ordre id 60 har stykliste id 140. Består af 10 materiale varianter
-		List<MaterialVariant> materialVariants = print.findMaterialVariantsByOrderID(ordreID,connectionPool);
+			// create the beam based on the MVs
+			List<Geometry3D> beams = print.createBeams(filteredMVs,csg);
 
-		print.convertMVMeasurements(materialVariants);
+			// create a collection of beams
+			Geometry3D collection = csg.union3D(beams);
 
-
-//		List<MaterialVariant> convertList = print.convertMVMeasurements(materialVariants);
-//
-//		MaterialVariant tegneTest = convertList.get(0);
-//
-//		double tegneW = tegneTest.getWidth();
-//		double tegneH = tegneTest.getHeight();
-//		double tegneD = tegneTest.getLength();
-//
-//
-//		var beam = csg.box3D(tegneW, tegneH, tegneD, false);
-//		csg.view(beam);
-//
-////
-		for (MaterialVariant convertedMaterialVariant : materialVariants) {
-			System.out.println("Materiale ID: " + convertedMaterialVariant.getMaterialeID());
-			System.out.println("Beskrivelse: " + convertedMaterialVariant.getDescription());
-			System.out.println("Brede: " + convertedMaterialVariant.getWidth());
-			System.out.println("Højde: " + convertedMaterialVariant.getHeight());
-			System.out.println("Længde: " + convertedMaterialVariant.getLength());
-			System.out.println("--------------------");
+			// view the collection
+			csg.view(collection);
+		} catch (SQLException |DatabaseException e) {
+			e.printStackTrace();
 		}
-
-
 	}
 }
+
+//		for (MaterialVariant convertedMaterialVariant : materialVariants) {
+//			System.out.println("Materiale ID: " + convertedMaterialVariant.getMaterialeID());
+//			System.out.println("Beskrivelse: " + convertedMaterialVariant.getDescription());
+//			System.out.println("Brede: " + convertedMaterialVariant.getWidth());
+//			System.out.println("Højde: " + convertedMaterialVariant.getHeight());
+//			System.out.println("Længde: " + convertedMaterialVariant.getLength());
+//			System.out.println("--------------------");
+//		}
+
+

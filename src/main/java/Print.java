@@ -1,3 +1,6 @@
+import org.abstractica.javacsg.Geometry3D;
+import org.abstractica.javacsg.JavaCSG;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +26,10 @@ public class Print {
      * @param orderID is used as a tool to match an ID.
      * @param connectionPool is used to work with the Mappers and Facades
      * @return A list of material variants associated with the order ID
-     * @throws SQLException if there is a problem accessing the database
+     * @throws SQLException      if there is a problem accessing the database
      * @throws DatabaseException if there is an error with the database connection or syntax errors
      */
     public List<MaterialVariant> findMaterialVariantsByOrderID(int orderID, ConnectionPool connectionPool) throws SQLException, DatabaseException {
-
         List<MaterialVariant> materialVariants = new ArrayList<>();
 
         // finds a BOM list with a maching order ID
@@ -55,9 +57,8 @@ public class Print {
 
     /**
      * @param materialVariants is the list that you want to convert
-     * @return
      */
-    public List<MaterialVariant> convertMVMeasurements(List<MaterialVariant> materialVariants) {
+    public void convertMVMeasurements(List<MaterialVariant> materialVariants) {
 
         for (MaterialVariant materialVariant : materialVariants) {
             int materialID = materialVariant.getMaterialeID();
@@ -80,6 +81,63 @@ public class Print {
             materialVariant.setHeight(heightInCM);
             materialVariant.setLength((int) printableLength);
         }
+    }
+
+    public List<MaterialVariant> filterUniqueMaterialVariants(List<MaterialVariant> materialVariants) {
+
+        List<MaterialVariant> uniqueMVs = new ArrayList<>();
+
+        for (MaterialVariant materialVariant : materialVariants) {
+            int materialID = materialVariant.getMaterialeID();
+            double length = materialVariant.getLength();
+
+            boolean isDuplicate = false;
+            for (MaterialVariant unique : uniqueMVs) {
+                if (unique.getMaterialeID() == materialID && unique.getLength() == length) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                uniqueMVs.add(materialVariant);
+            }
+        }
+        return uniqueMVs;
+    }
+
+    public List<MaterialVariant> findAndConvertMVsByOrderID(int orderID, ConnectionPool connectionPool) throws SQLException, DatabaseException {
+        List<MaterialVariant> materialVariants = findMaterialVariantsByOrderID(orderID,connectionPool);
+        convertMVMeasurements(materialVariants);
         return materialVariants;
+    }
+
+    public List<Geometry3D> createBeams(List<MaterialVariant> materialVariants, JavaCSG csg){
+        List<Geometry3D> beamsToDraw = new ArrayList<>();
+
+        // start position on SCAD axis
+		double x = 1;
+		double y = 1;
+		double z = 1;
+
+		// draws every unique beam
+		for (MaterialVariant tegneMV : materialVariants){
+			double width = tegneMV.getWidth();
+			double height = tegneMV.getHeight();
+			double length = tegneMV.getLength();
+
+			// Create beams with unique measurements
+			var beam = csg.box3D(width,height,length,false);
+
+            // moves the placement of the beam
+			beam = csg.translate3D(x,y,z).transform(beam);
+
+			beamsToDraw.add(beam);
+
+			// updates the beams position for every unique beam
+			x +=1;
+			y +=1;
+			z +=1;
+		}
+		return beamsToDraw;
     }
 }
