@@ -20,7 +20,7 @@ public class Print {
      *  */
 
     final double maxPrintLength = 20;
-    final double maxIRLLength = 600;
+    final double maxIRLLength = 60;
 
     /**
      * @param orderID is used as a tool to match an ID.
@@ -115,9 +115,9 @@ public class Print {
         List<Geometry3D> beamsToDraw = new ArrayList<>();
 
         // start position on SCAD axis
-		double x = 1;
-		double y = 1;
-		double z = 1;
+		double x = 0;
+		double y = 0;
+		double z = 0;
 
 		// draws every unique beam
 		for (MaterialVariant tegneMV : materialVariants){
@@ -126,17 +126,19 @@ public class Print {
 			double length = tegneMV.getLength();
 
 			// Create beams with unique measurements
-			var beam = csg.box3D(width,height,length,false);
+			var beam = csg.box3D(length,width,height,false);
 
             // moves the placement of the beam
 			beam = csg.translate3D(x,y,z).transform(beam);
 
+            // rotates the beams, so they lie down both are flat
+//           beam = csg.rotate3DX(csg.degrees(0)).transform(beam);
+
 			beamsToDraw.add(beam);
 
 			// updates the beams position for every unique beam
-			x +=1;
-			y +=1;
-			z +=1;
+			x +=10;
+            y += 10;
 		}
 		return beamsToDraw;
     }
