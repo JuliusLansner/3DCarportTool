@@ -131,9 +131,6 @@ public class Print {
             // moves the placement of the beam
 			beam = csg.translate3D(x,y,z).transform(beam);
 
-            // rotates the beams, so they lie down both are flat
-//           beam = csg.rotate3DX(csg.degrees(0)).transform(beam);
-
 			beamsToDraw.add(beam);
 
 			// updates the beams position for every unique beam
