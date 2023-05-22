@@ -160,6 +160,8 @@ public class Print {
                 remmeCount++;
             } else if (materialID == 2 && description.equals("Stolper til længde")){
                 stolpeCount++;
+            } else if (materialID == 2 && description.equals("stolper til brede")){
+                stolpeCount++;
             }
         }
 

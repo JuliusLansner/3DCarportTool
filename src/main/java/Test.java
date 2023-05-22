@@ -14,10 +14,16 @@ public class Test
 		JavaCSG csg = JavaCSGFactory.createDefault();
 		Print print = new Print();
 
-		// OBS ordre ID har stykliste ID 140
+		// OBS ordre ID 66 har stykliste ID 146
 		// Da der findes flere MV'er med samme material ID og længde genereres der "kun" 2 objekter
 		// I dette tilfælde er remme og spær det "samme".
-		int orderID = 60;
+
+		System.out.println("Indtast et ordre ID :");
+		Scanner scanner = new Scanner(System.in);
+		int orderID = scanner.nextInt();
+
+
+//		int orderID = 60;
 
 		try {
 			// find and convert the material variants
