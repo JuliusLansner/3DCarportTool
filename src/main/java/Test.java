@@ -22,9 +22,6 @@ public class Test
 		Scanner scanner = new Scanner(System.in);
 		int orderID = scanner.nextInt();
 
-
-//		int orderID = 60;
-
 		try {
 			// find and convert the material variants
 			List<MaterialVariant> materialVariants = print.findAndConvertMVsByOrderID(orderID, connectionPool);
@@ -48,14 +45,4 @@ public class Test
 		}
 	}
 }
-
-//		for (MaterialVariant convertedMaterialVariant : materialVariants) {
-//			System.out.println("Materiale ID: " + convertedMaterialVariant.getMaterialeID());
-//			System.out.println("Beskrivelse: " + convertedMaterialVariant.getDescription());
-//			System.out.println("Brede: " + convertedMaterialVariant.getWidth());
-//			System.out.println("Højde: " + convertedMaterialVariant.getHeight());
-//			System.out.println("Længde: " + convertedMaterialVariant.getLength());
-//			System.out.println("--------------------");
-//		}
-
 
