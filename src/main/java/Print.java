@@ -6,34 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Print class gives utility with converting DB data into 3D printable measurements
- * The methods allows you to find material variants with an order ID, and covert them intoappropiate measurements that fits our current 3D printer
+ * The print class provides methods that can convert material variants into 3D printable measurements, and draw the project in the related OpenSCAD file.
+ * It is used by users of this applikation, who wants to create a 3D version of a given carport.
+ * An object of this class is made the Main class
  */
 public class Print {
 
-    /* Skalering forklaret:
-     * 3D printer kan maks printe 20 cm.
-     * Den længste stolpe vi har er 600 cm IRL.
-     * Skalering = max3DPrintLængde = størrelse * (20cm/600cm)
-     * Eksempel af udregning af længden på et 4m langt materiale:
-     * 3DPrintLænge = 400cm * (20cm/600cm)
-     *  */
-
-    final double maxPrintLength = 20;
-    final double maxIRLLength = 60;
+    private static final double maxPrintLength = 20;
+    private static final double maxIRLLength = 60;
 
     /**
-     * @param orderID is used as a tool to match an ID.
-     * @param connectionPool is used to work with the Mappers and Facades
-     * @return A list of material variants associated with the order ID
-     * @throws SQLException if there is a problem accessing the database
-     * @throws DatabaseException if there is an error with the database connection or syntax errors
+     * @param orderID        the ID that is entered by the user
+     * @param connectionPool allows for database access
+     * @return a list of material variants associated with the order ID
+     * @throws SQLException      if there is an error accesing the database
+     * @throws DatabaseException if there is an error with the database connection
      */
     public List<MaterialVariant> findMaterialVariantsByOrderID(int orderID, ConnectionPool connectionPool) throws SQLException, DatabaseException {
         List<MaterialVariant> materialVariants = new ArrayList<>();
 
-        // finds a BOM list with a maching order ID
-        List<Bom> boms = BomMapper.getBoms(connectionPool);
+        // finds a BOM list with a macthing order ID
+        List<Bom> boms = BomFacade.getBoms(connectionPool);
         Bom startBom = null;
         for (Bom bom : boms) {
             if (bom.getOrderId() == orderID) {
@@ -56,7 +49,7 @@ public class Print {
     }
 
     /**
-     * @param materialVariants is the list that you want to convert
+     * @param materialVariants the list of material variants to convert
      */
     public void convertMVMeasurements(List<MaterialVariant> materialVariants) {
 
@@ -83,89 +76,103 @@ public class Print {
         }
     }
 
-    public List<MaterialVariant> filterUniqueMaterialVariants(List<MaterialVariant> materialVariants) {
-
-        List<MaterialVariant> uniqueMVs = new ArrayList<>();
-
-        for (MaterialVariant materialVariant : materialVariants) {
-            int materialID = materialVariant.getMaterialeID();
-            double length = materialVariant.getLength();
-
-            boolean isDuplicate = false;
-            for (MaterialVariant unique : uniqueMVs) {
-                if (unique.getMaterialeID() == materialID && unique.getLength() == length) {
-                    isDuplicate = true;
-                    break;
-                }
-            }
-            if (!isDuplicate) {
-                uniqueMVs.add(materialVariant);
-            }
-        }
-        return uniqueMVs;
-    }
-
+    /**
+     * @param orderID        is the ID that is entered by the user
+     * @param connectionPool allows for database acces
+     * @return a list of material variants that has been converted into 3D printable measurements
+     * @throws SQLException      if there is an error accesing the database
+     * @throws DatabaseException if there is an error with the database connection
+     */
     public List<MaterialVariant> findAndConvertMVsByOrderID(int orderID, ConnectionPool connectionPool) throws SQLException, DatabaseException {
-        List<MaterialVariant> materialVariants = findMaterialVariantsByOrderID(orderID,connectionPool);
+        List<MaterialVariant> materialVariants = findMaterialVariantsByOrderID(orderID, connectionPool);
         convertMVMeasurements(materialVariants);
         return materialVariants;
     }
 
-    public List<Geometry3D> createBeams(List<MaterialVariant> materialVariants, JavaCSG csg){
+    /**
+     * @param materialVariants the list of material variants to create beams from
+     * @param csg              is used to create 3D objects in OpenSCAD
+     * @return a list of 3D beams
+     */
+    public List<Geometry3D> createBeams(List<MaterialVariant> materialVariants, JavaCSG csg) {
         List<Geometry3D> beamsToDraw = new ArrayList<>();
 
         // start position on SCAD axis
-		double x = 0;
-		double y = 0;
-		double z = 0;
+        double x = 0;
+        double y = 0;
+        double z = 0;
 
-		// draws every unique beam
-		for (MaterialVariant tegneMV : materialVariants){
-			double width = tegneMV.getWidth();
-			double height = tegneMV.getHeight();
-			double length = tegneMV.getLength();
+        // draws every beam
+        for (MaterialVariant tegneMV : materialVariants) {
+            double width = tegneMV.getWidth();
+            double height = tegneMV.getHeight();
+            double length = tegneMV.getLength();
 
-			// Create beams with unique measurements
-			var beam = csg.box3D(length,width,height,false);
+            // create beams
+            var beam = csg.box3D(length, width, height, false);
 
             // moves the placement of the beam
-			beam = csg.translate3D(x,y,z).transform(beam);
+            beam = csg.translate3D(x, y, z).transform(beam);
 
-			beamsToDraw.add(beam);
+            beamsToDraw.add(beam);
 
-			// updates the beams position for every unique beam
-			x +=10;
+            // updates the beams position for every beam
             y += 10;
-		}
-		return beamsToDraw;
+        }
+        return beamsToDraw;
     }
 
-    public void printMVCounts(List<MaterialVariant> materialVariants){
+    /**
+     * @param materialVariants is the list of material variants the user wants to count and print out
+     */
+    public void printMVCounts(List<MaterialVariant> materialVariants) {
         // count the number of each type of material variant that is needed to build the project
-        // rafter means spær in danish
         int rafterCount = 0;
         int remmeCount = 0;
         int stolpeCount = 0;
 
-        for (MaterialVariant materialVariant : materialVariants){
+        for (MaterialVariant materialVariant : materialVariants) {
             int materialID = materialVariant.getMaterialeID();
             String description = materialVariant.getDescription();
 
-            if (materialID == 1 && description.equals("Spær til taget")){
+            if (materialID == 1 && description.equals("Spær til taget")) {
                 rafterCount++;
-            } else if (materialID == 1 && description.equals("rem til oven på stolper")){
+            } else if (materialID == 1 && description.equals("Rem til oven på stolper")) {
                 remmeCount++;
-            } else if (materialID == 2 && description.equals("Stolper til længde")){
-                stolpeCount++;
-            } else if (materialID == 2 && description.equals("stolper til brede")){
+            } else if (materialID == 2 && description.equals("Stolper til længde") || description.equals("Stolper til brede")) {
                 stolpeCount++;
             }
         }
-
-        // shows the user how many of each item should be made
+        // shows the user how many of each item should be used to complete the project
         System.out.println("For at bygge projektet skal du bruge: ");
         System.out.println("Spær: " + rafterCount);
         System.out.println("Remme: " + remmeCount);
         System.out.println("Stolper: " + stolpeCount);
+    }
+
+    /**
+     * @param orderID        the ID that is entered by the user
+     * @param connectionPool allows for database access
+     * @param csg            is used to create 3D objects in OpenSCAD
+     */
+    public void printAndDrawProject(int orderID, ConnectionPool connectionPool, JavaCSG csg) {
+        try {
+            // find and convert the material variants
+            List<MaterialVariant> materialVariants = findAndConvertMVsByOrderID(orderID, connectionPool);
+
+            // create the beam based on the MVs
+            List<Geometry3D> beams = createBeams(materialVariants, csg);
+
+            // create a collection of beams
+            Geometry3D collection = csg.union3D(beams);
+
+            // view the collection
+            csg.view(collection);
+
+            // shows the user how many of each should be made to complete the project
+            printMVCounts(materialVariants);
+        } catch (SQLException | DatabaseException e) {
+            e.printStackTrace();
+        }
     }
 }
