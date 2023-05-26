@@ -128,8 +128,8 @@ public class Print {
     public void printMVCounts(List<MaterialVariant> materialVariants) {
         // count the number of each type of material variant that is needed to build the project
         int rafterCount = 0;
-        int remmeCount = 0;
-        int stolpeCount = 0;
+        int beamCount = 0;
+        int postCount = 0;
 
         for (MaterialVariant materialVariant : materialVariants) {
             int materialID = materialVariant.getMaterialeID();
@@ -138,16 +138,16 @@ public class Print {
             if (materialID == 1 && description.equals("Spær til taget")) {
                 rafterCount++;
             } else if (materialID == 1 && description.equals("Rem til oven på stolper")) {
-                remmeCount++;
+                beamCount++;
             } else if (materialID == 2 && description.equals("Stolper til længde") || description.equals("Stolper til brede")) {
-                stolpeCount++;
+                postCount++;
             }
         }
         // shows the user how many of each item should be used to complete the project
         System.out.println("For at bygge projektet skal du bruge: ");
         System.out.println("Spær: " + rafterCount);
-        System.out.println("Remme: " + remmeCount);
-        System.out.println("Stolper: " + stolpeCount);
+        System.out.println("Remme: " + beamCount);
+        System.out.println("Stolper: " + postCount);
     }
 
     /**
@@ -160,11 +160,11 @@ public class Print {
             // find and convert the material variants
             List<MaterialVariant> materialVariants = findAndConvertMVsByOrderID(orderID, connectionPool);
 
-            // create the beam based on the MVs
-            List<Geometry3D> beams = createBeams(materialVariants, csg);
+            // create the materials based on the MVs
+            List<Geometry3D> allMaterials = createBeams(materialVariants, csg);
 
             // create a collection of beams
-            Geometry3D collection = csg.union3D(beams);
+            Geometry3D collection = csg.union3D(allMaterials);
 
             // view the collection
             csg.view(collection);
