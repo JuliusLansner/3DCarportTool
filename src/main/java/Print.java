@@ -12,9 +12,6 @@ import java.util.List;
  */
 public class Print {
 
-    private static final double maxPrintLength = 20;
-    private static final double maxIRLLength = 600;
-
     /**
      * @param orderID        the ID that is entered by the user
      * @param connectionPool allows for database access
@@ -52,6 +49,9 @@ public class Print {
      * @param materialVariants the list of material variants to convert
      */
     public void convertMVMeasurements(List<MaterialVariant> materialVariants) {
+
+        final double maxPrintLength = 20;
+        final double maxIRLLength = 600;
 
         for (MaterialVariant materialVariant : materialVariants) {
             int materialID = materialVariant.getMaterialeID();
