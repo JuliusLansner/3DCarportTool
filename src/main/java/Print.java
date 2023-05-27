@@ -13,7 +13,7 @@ import java.util.List;
 public class Print {
 
     private static final double maxPrintLength = 20;
-    private static final double maxIRLLength = 60;
+    private static final double maxIRLLength = 600;
 
     /**
      * @param orderID        the ID that is entered by the user
@@ -70,9 +70,9 @@ public class Print {
 
             double printableLength = lengthIRL * (maxPrintLength / maxIRLLength);
 
-            materialVariant.setWidth(widthInCM);
-            materialVariant.setHeight(heightInCM);
-            materialVariant.setLength((int) printableLength);
+            materialVariant.setWidth(widthInCM * 10);
+            materialVariant.setHeight(heightInCM * 10);
+            materialVariant.setLength((int) printableLength * 10);
         }
     }
 
@@ -103,10 +103,10 @@ public class Print {
         double z = 0;
 
         // draws every beam
-        for (MaterialVariant tegneMV : materialVariants) {
-            double width = tegneMV.getWidth();
-            double height = tegneMV.getHeight();
-            double length = tegneMV.getLength();
+        for (MaterialVariant drawMV : materialVariants) {
+            double width = drawMV.getWidth();
+            double height = drawMV.getHeight();
+            double length = drawMV.getLength();
 
             // create beams
             var beam = csg.box3D(length, width, height, false);
